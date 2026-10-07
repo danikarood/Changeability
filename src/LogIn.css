@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Raleway:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-orange: #E8642F;       /* Primary CTA & Accent */
+  --color-red-orange: #D4613A;   /* Headline text & shapes */
+  --color-beige: #EFECE6;        /* Canvas background */
+  --color-black: #000000;
+  --font-heading: 'Merriweather', serif;
+  --font-body: 'Raleway', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-beige);
+  font-family: var(--font-body);
+}
+
+/* Outer Container */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-beige);
+  overflow: hidden;
+}
+
+/* Left Hero Section */
+.login-left {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px 60px 80px 60px;
+  background-color: var(--color-beige);
+}
+
+
+.brand-header {
+  z-index: 10;
+}
+
+.brand-logo-img {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.hero-content {
+  z-index: 10;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 4.5vw, 64px);
+  font-weight: 700;
+  color: var(--color-red-orange);
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: #555555;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Decorative Background Shapes */
+.decorative-graphics {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shape-red-corner {
+  position: absolute;
+  bottom: -60px;
+  left: -60px;
+  width: 260px;
+  height: 260px;
+  background-color: var(--color-red-orange);
+  border-radius: 80px;
+  transform: rotate(20deg);
+}
+
+.shape-orange-outline {
+  position: absolute;
+  bottom: -30px;
+  left: 40px;
+  width: 230px;
+  height: 230px;
+  border: 2px solid #EFA76A;
+  border-radius: 70px;
+  transform: rotate(35deg);
+}
+
+.circle-group {
+  position: absolute;
+  bottom: 40px;
+  right: 60px;
+  display: flex;
+  gap: 16px;
+}
+
+.circle-outline {
+  width: 38px;
+  height: 38px;
+  border: 2px solid #EFA76A;
+  border-radius: 50%;
+}
+
+/* Right Form Card Section */
+.login-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: var(--color-beige);
+}
+
+.form-card {
+  background-color: #FFFFFF;
+  width: 100%;
+  max-width: 460px;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.form-category {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-orange);
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-title {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 8px;
+}
+
+.form-description {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 28px;
+  line-height: 1.4;
+}
+
+/* Form Controls */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  background-color: #FAFAFA;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: var(--color-orange);
+  background-color: #FFFFFF;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 48px;
+}
+
+.eye-icon-btn {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #888888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.eye-icon-btn:hover {
+  color: var(--color-orange);
+}
+
+.eye-icon-btn:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: 2px;
+}
+
+/* Remember Me & Forgot Password Row */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555555;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--color-orange);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-password-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-orange);
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* Button & Links */
+.submit-btn {
+  background-color: var(--color-orange);
+  color: #FFFFFF;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: var(--color-red-orange);
+}
+
+.form-footer {
+  text-align: center;
+  font-size: 13px;
+  color: #666666;
+  margin-top: 24px;
+}
+
+.signup-link {
+  color: var(--color-orange);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}

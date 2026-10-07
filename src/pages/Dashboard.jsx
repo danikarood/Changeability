@@ -1,103 +1,211 @@
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Sidebar from '../components/sidebar';
 import '../App.css';
-import TeamCard from '../components/TeamCard';// pulling in the new components so that all the cards could have logos.
 
-function Home() {
-  const [teams, setTeams] = useState([]);
-  const [standings, setStandings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
-  const carouselRef = useRef(null);
+export default function Dashboard() {
+  const beneficiaries = [
+    { name: 'Charlene Fortuin', img: 'https://i.pravatar.cc/100?img=47' },
+    { name: 'Johan Steyn', img: 'https://i.pravatar.cc/100?img=12' },
+    { name: 'Nokuthula Dlamini', img: 'https://i.pravatar.cc/100?img=32' },
+  ];
 
-  const API_KEY = "dc88cdd9263fa29e592b9e6ed1901ba9";
+  const calendarEvents = [
+    { title: 'Awareness Workshop', time: '10:00', date: '7/1/27' },
+    { title: 'Beneficiary Assessments', time: '10:00', date: '11/1/27' },
+    { title: 'Community Participationprogramme', time: '10:00', date: '19/1/27' },
+    { title: 'Volunteer orientation', time: '10:00', date: '28/1/27' },
+  ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [sRes, tRes] = await Promise.all([
-          axios.get('https://v1.rugby.api-sports.io/standings?league=76&season=2024', { headers: { 'x-apisports-key': API_KEY } }),
-          axios.get('https://v1.rugby.api-sports.io/teams?league=76&season=2024', { headers: { 'x-apisports-key': API_KEY } })
-        ]);
+  const disabilityData = [
+    { type: 'Physical', count: 12, color: '#C85A28' },
+    { type: 'Intellectual', count: 18, color: '#E8642F' },
+    { type: 'Visual', count: 3, color: '#F09D67' },
+    { type: 'Hearing', count: 22, color: '#A0421B' },
+    { type: 'Developmental', count: 12, color: '#EFA76A' },
+    { type: 'Neurological', count: 22, color: '#783012' },
+    { type: 'Other', count: 3, color: '#B0A89A' },
+  ];
 
-        if (sRes.data.response?.[0]) setStandings(sRes.data.response[0].slice(0, 3));
-        if (tRes.data.response) setTeams(tRes.data.response);
-      } catch (err) {
-        console.error("Error while fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const dietaryData = [
+    { label: 'None', val: 12, color: '#C85A28', percent: '100%' },
+    { label: 'Vegetarian', val: 8, color: '#E8642F', percent: '66%' },
+    { label: 'Halal', val: 7, color: '#F09D67', percent: '58%' },
+    { label: 'Allergies', val: 5, color: '#D4613A', percent: '42%' },
+    { label: 'Other', val: 4, color: '#B0A89A', percent: '33%' },
+  ];
 
-  useEffect(() => {
-    if (isPaused || loading || teams.length === 0) return;
-    const interval = setInterval(() => {
-      if (carouselRef.current) {
-        carouselRef.current.scrollLeft += 1.2; 
-        if (carouselRef.current.scrollLeft >= (carouselRef.current.scrollWidth - carouselRef.current.clientWidth)) {
-          carouselRef.current.scrollLeft = 0;
-        }
-      }
-    }, 20);
-    return () => clearInterval(interval);
-  }, [isPaused, loading, teams]);
-
-  if (loading) return <div className="loading-screen">URC DATA SYNC...</div>;
+  const ageGenderData = [
+    { group: '0-12', male: 4, female: 2 },
+    { group: '13-17', male: 7, female: 10 },
+    { group: '18-25', male: 15, female: 12 },
+    { group: '26-40', male: 15, female: 15 },
+    { group: '41-60', male: 11, female: 10 },
+    { group: '60+', male: 14, female: 12 },
+  ];
 
   return (
-    <div className="landing-container" style={{ 
-      background: 'radial-gradient(circle at 50% 50%, #1a2a44 0%, #0B192C 100%)', 
-      minHeight: '100vh', 
-      padding: '40px 20px' 
-    }}>
-      
-      {/* 2024 TOP PERFORMERS BANNER */}
-      <div className="glass-banner" style={{ 
-        background: 'rgba(255, 101, 0, 0.08)', 
-        border: '1px solid rgba(255, 101, 0, 0.3)', 
-        padding: '30px', 
-        borderRadius: '25px', 
-        marginBottom: '60px', 
-        textAlign: 'center',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <h2 style={{ color: '#FF6500', fontWeight: '900', letterSpacing: '2px', marginBottom: '25px' }}>2024 TOP PERFORMERS</h2>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', flexWrap: 'wrap' }}>
-          {standings.map((pos, i) => (
-            <div key={i} style={{ 
-              display: 'flex', alignItems: 'center', gap: '15px', 
-              background: 'rgba(255, 255, 255, 0.05)', padding: '10px 25px', 
-              borderRadius: '50px', border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
-              <span style={{ color: '#FF6500', fontWeight: '900' }}>#{i+1}</span>
-              <img src={pos.team.logo} alt="" style={{ height: '35px', objectFit: 'contain' }} />
-              <span style={{ color: 'white', fontWeight: 'bold' }}>{pos.team.name}: {pos.points} PTS</span>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="dashboard-layout">
+      {/* Sticky Sidebar */}
+      <Sidebar />
 
-      <h2 style={{ color: 'white', marginBottom: '30px', fontWeight: '800' }}>EXPLORE CONTENDERS</h2>
-      
-      {/* CAROUSEL */}
-      <div 
-        ref={carouselRef}
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        style={{ 
-          display: 'flex', overflowX: 'auto', gap: '25px', 
-          paddingBottom: '30px', scrollbarWidth: 'none', paddingLeft: '10px'
-        }}
-      >
-        {teams.map(team => (
-          <TeamCard key={team?.id || team?.team?.id} team={team} />
-        ))}
-      </div>
+      {/* Main Content Area */}
+      <main className="dashboard-content">
+        <h1 className="welcome-header">WELCOME DANIKA</h1>
+
+        {/* Top Section: Reminders, To Do, Search & Beneficiaries */}
+        <div className="top-grid">
+          {/* Left Column */}
+          <div className="left-stack">
+            <div className="card pattern-card-1">
+              <h3 className="card-title">Reminders</h3>
+              <div className="card-pattern-overlay"></div>
+            </div>
+            <div className="card pattern-card-2">
+              <h3 className="card-title">To do</h3>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="right-stack">
+            <div className="search-bar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" placeholder="Search" />
+            </div>
+
+            <div className="card beneficiaries-card pattern-card-3">
+              <h3 className="card-title">Beneficiaries</h3>
+              <div className="beneficiaries-list">
+                {beneficiaries.map((b) => (
+                  <div key={b.name} className="beneficiary-item">
+                    <img src={b.img} alt={b.name} />
+                    <span>{b.name}</span>
+                  </div>
+                ))}
+              </div>
+              <Link className="view-all-btn" to="/beneficiaries">
+                View all beneficiaries
+              </Link>
+              
+            </div>
+          </div>
+        </div>
+
+        {/* Calendar Section */}
+        <div className="card calendar-card pattern-card-4">
+          <h3 className="section-heading">Calendar</h3>
+          <p className="section-subheading">Upcoming Events</p>
+          <div className="calendar-events-grid">
+            {calendarEvents.map((ev, i) => (
+              <div key={i} className="event-col">
+                <span className="event-title">{ev.title}</span>
+                <span className="event-time">{ev.time}</span>
+                <span className="event-date">{ev.date}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Disability Chart Section */}
+        <div className="card chart-card pattern-card-5">
+          <div className="disability-layout">
+            <div className="bar-chart-container">
+              <div className="bars-wrapper">
+                {disabilityData.map((d) => (
+                  <div key={d.type} className="bar-column">
+                    <span className="bar-value">{d.count}</span>
+                    <div
+                      className="bar-fill"
+                      style={{
+                        height: `${(d.count / 22) * 120}px`,
+                        backgroundColor: d.color,
+                      }}
+                    ></div>
+                  </div>
+                ))}
+              </div>
+              <div className="chart-baseline"></div>
+            </div>
+
+            <div className="disability-legend">
+              <div className="legend-header">
+                <h3>Disability</h3>
+                <span>Beneficiaries</span>
+              </div>
+              <div className="legend-list">
+                {disabilityData.map((d) => (
+                  <div key={d.type} className="legend-item">
+                    <span className="dot" style={{ backgroundColor: d.color }}></span>
+                    <span className="label">{d.type}</span>
+                    <span className="count">{d.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dietary Requirements Section */}
+        <div className="card dietary-card pattern-card-6">
+          <h3 className="section-title-left">Dietary Requirements</h3>
+          <div className="dietary-list">
+            {dietaryData.map((item) => (
+              <div key={item.label} className="dietary-row">
+                <span className="dietary-label">{item.label}</span>
+                <div className="progress-bg">
+                  <div
+                    className="progress-fill"
+                    style={{ width: item.percent, backgroundColor: item.color }}
+                  ></div>
+                </div>
+                <span className="dietary-val">{item.val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Age and Gender Section */}
+        <div className="card age-gender-card pattern-card-7">
+          <h3 className="section-title-left">Age and Gender</h3>
+          
+          <div className="gender-legend">
+            <span className="legend-dot male-dot"></span>
+            <span className="legend-text">Male</span>
+            <span className="legend-dot female-dot"></span>
+            <span className="legend-text">Female</span>
+          </div>
+
+          <div className="dual-bar-chart">
+            <div className="grouped-bars-wrapper">
+              {ageGenderData.map((ag) => (
+                <div key={ag.group} className="age-group-col">
+                  <div className="bars-pair">
+                    <div className="bar-wrapper">
+                      <span className="val-top">{ag.male}</span>
+                      <div
+                        className="bar male-bar"
+                        style={{ height: `${(ag.male / 15) * 130}px` }}
+                      ></div>
+                    </div>
+                    <div className="bar-wrapper">
+                      <span className="val-top">{ag.female}</span>
+                      <div
+                        className="bar female-bar"
+                        style={{ height: `${(ag.female / 15) * 130}px` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <span className="group-label">{ag.group}</span>
+                </div>
+              ))}
+            </div>
+            <div className="chart-baseline"></div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
-
-export default Home;

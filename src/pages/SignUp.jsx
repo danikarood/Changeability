@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/ChangeAbility-Logo.webp';
-import '../App.css';
+import '../SignUp.css';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +38,7 @@ export default function SignUp() {
           </p>
         </div>
 
-        {/* Decorative Background Graphics */}
+        {/* Decorative Shapes Layer */}
         <div className="decorative-graphics">
           <div className="shape-red-corner"></div>
           <div className="shape-orange-outline"></div>
@@ -60,7 +60,6 @@ export default function SignUp() {
           </p>
 
           <form onSubmit={handleSubmit} className="signup-form">
-            {/* Full Name */}
             <div className="input-group">
               <label htmlFor="fullName">FULL NAME</label>
               <input
@@ -74,7 +73,6 @@ export default function SignUp() {
               />
             </div>
 
-            {/* Email Address */}
             <div className="input-group">
               <label htmlFor="email">EMAIL ADDRESS</label>
               <input
@@ -88,7 +86,6 @@ export default function SignUp() {
               />
             </div>
 
-            {/* Password */}
             <div className="input-group">
               <label htmlFor="password">PASSWORD</label>
               <div className="password-input-wrapper">
@@ -96,7 +93,7 @@ export default function SignUp() {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="example@123"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -105,17 +102,18 @@ export default function SignUp() {
                   type="button"
                   className="eye-icon-btn"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label="Toggle password visibility"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
+                    {!showPassword && <path d="M3 3l18 18"></path>}
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div className="input-group">
               <label htmlFor="confirmPassword">CONFIRM PASSWORD</label>
               <div className="password-input-wrapper">
@@ -123,7 +121,7 @@ export default function SignUp() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   name="confirmPassword"
-                  placeholder="••••••••"
+                  placeholder="example@123"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -132,23 +130,23 @@ export default function SignUp() {
                   type="button"
                   className="eye-icon-btn"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label="Toggle confirm password visibility"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  aria-pressed={showConfirmPassword}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
+                    {!showConfirmPassword && <path d="M3 3l18 18"></path>}
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
             <button type="submit" className="submit-btn">
               CREATE ACCOUNT
             </button>
           </form>
 
-          {/* Footer Link */}
           <p className="form-footer">
             Already have an account? <Link to="/login" className="signin-link">Sign In</Link>
           </p>
