@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../assets/ChangeAbility-Logo.webp';
 import '../App.css';
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -11,145 +14,145 @@ export default function SignUp() {
     confirmPassword: '',
   });
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('Form submitted:', formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form Submitted:', formData);
   };
 
   return (
     <div className="signup-container">
+      {/* Left Branding Hero Section */}
       <div className="signup-left">
         <div className="brand-header">
-          <div className="brand-logo-icon" aria-hidden="true">
-            <svg viewBox="0 0 100 100" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 50 A30 30 0 0 1 80 50" stroke="#E8642F" strokeWidth="8" strokeLinecap="round" />
-              <path d="M30 50 A20 20 0 0 1 70 50" stroke="#E8642F" strokeWidth="8" strokeLinecap="round" />
-              <path d="M40 50 A10 10 0 0 1 60 50" stroke="#E8642F" strokeWidth="8" strokeLinecap="round" />
-              <circle cx="15" cy="30" r="3" fill="#E8642F" />
-              <circle cx="12" cy="42" r="3" fill="#E8642F" />
-              <circle cx="15" cy="54" r="3" fill="#E8642F" />
-            </svg>
-          </div>
-          <span className="brand-name">CHANGEABILITY</span>
+          <img src={logo} alt="ChangeAbility Logo" className="brand-logo-img" />
         </div>
 
         <div className="hero-content">
-          <h1 className="hero-title">SEE DIFFERENTLY</h1>
+          <h1 className="hero-title">See Differently</h1>
           <p className="hero-subtitle">
             A welcoming place to connect people, care, and possibility.
           </p>
         </div>
 
-        <div className="decorative-graphics" aria-hidden="true">
-          <div className="shape-red-corner" />
-          <div className="shape-orange-outline" />
+        {/* Decorative Background Graphics */}
+        <div className="decorative-graphics">
+          <div className="shape-red-corner"></div>
+          <div className="shape-orange-outline"></div>
           <div className="circle-group">
-            <span className="circle-outline" />
-            <span className="circle-outline" />
-            <span className="circle-outline" />
+            <span className="circle-outline"></span>
+            <span className="circle-outline"></span>
+            <span className="circle-outline"></span>
           </div>
         </div>
       </div>
 
+      {/* Right Form Section */}
       <div className="signup-right">
         <div className="form-card">
           <span className="form-category">CHANGEABILITY</span>
-          <h2 className="form-title">Create your account</h2>
+          <h2 className="form-title">Create Your Account</h2>
           <p className="form-description">
-            Join Changeability to help coordinate meaningful care and support.
+            Join ChangeAbility to help coordinate meaningful care and support.
+          </p>
+
+          <form onSubmit={handleSubmit} className="signup-form">
+            {/* Full Name */}
+            <div className="input-group">
+              <label htmlFor="fullName">FULL NAME</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                placeholder="Your full name"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* Email Address */}
+            <div className="input-group">
+              <label htmlFor="email">EMAIL ADDRESS</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="name@changeability.org"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* Password */}
+            <div className="input-group">
+              <label htmlFor="password">PASSWORD</label>
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className="eye-icon-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password visibility"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="input-group">
+              <label htmlFor="confirmPassword">CONFIRM PASSWORD</label>
+              <div className="password-input-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className="eye-icon-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label="Toggle confirm password visibility"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button type="submit" className="submit-btn">
+              CREATE ACCOUNT
+            </button>
+          </form>
+
+          {/* Footer Link */}
+          <p className="form-footer">
+            Already have an account? <Link to="/login" className="signin-link">Sign In</Link>
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="signup-form">
-          <div className="input-group">
-            <label htmlFor="fullName">Full name</label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              placeholder="Your full name"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="email">Email address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="name@changeability.org"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-input-wrapper">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="eye-icon-btn"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label="Toggle password visibility"
-              >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="12" r="3" stroke="#777" strokeWidth="2"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="confirmPassword">Confirm password</label>
-            <div className="password-input-wrapper">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="eye-icon-btn"
-                onClick={() => setShowConfirmPassword((current) => !current)}
-                aria-label="Toggle confirm password visibility"
-              >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="12" r="3" stroke="#777" strokeWidth="2"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" className="signup-btn">Create account</button>
-
-          <p className="form-footer">
-            Already have an account? <a href="/login">Log in</a>
-          </p>
-        </form>
       </div>
     </div>
   );
