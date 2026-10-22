@@ -26,7 +26,9 @@ html, body {
 /* Outer Container */
 .login-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   width: 100%;
   background-color: var(--color-beige);
   overflow: hidden;
@@ -42,6 +44,8 @@ html, body {
   justify-content: space-between;
   padding: 40px 60px 80px 60px;
   background-color: var(--color-beige);
+  background-image: radial-gradient(circle, rgba(212, 97, 58, 0.1) 1px, transparent 1.5px);
+  background-size: 26px 26px;
 }
 
 
@@ -56,9 +60,13 @@ html, body {
 }
 
 .hero-content {
+  position: absolute;
+  top: 50%;
+  left: 60px;
   z-index: 10;
   max-width: 500px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  transform: translateY(-50%);
 }
 
 .hero-title {
@@ -132,15 +140,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: clamp(16px, 4vh, 40px);
   background-color: var(--color-beige);
+  background-image: radial-gradient(circle, rgba(212, 97, 58, 0.08) 1px, transparent 1.5px);
+  background-size: 26px 26px;
 }
 
 .form-card {
   background-color: #FFFFFF;
   width: 100%;
   max-width: 460px;
-  padding: 40px;
+  padding: clamp(20px, 4vh, 40px);
   border-radius: 24px;
   box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.04);
 }
@@ -310,4 +320,23 @@ html, body {
 
 .signup-link:hover {
   text-decoration: underline;
+}
+
+@media (max-height: 700px) {
+  .login-form {
+    gap: 12px;
+  }
+
+  .form-description {
+    margin-bottom: 14px;
+  }
+
+  .input-group input {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  .form-footer {
+    margin-top: 14px;
+  }
 }

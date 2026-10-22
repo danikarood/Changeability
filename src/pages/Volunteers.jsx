@@ -5,8 +5,17 @@ import '../App.css';
 export default function Volunteers() {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newVolunteer, setNewVolunteer] = useState({
+    name: '',
+    age: '',
+    gender: 'F',
+    programme: 'CS&D',
+    img: '',
+  });
+  const [imageError, setImageError] = useState('');
 
-  const volunteers = [
+  const [volunteers, setVolunteers] = useState([
     { id: 1, name: 'Marlene Fourie', age: 41, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=47' },
     { id: 2, name: 'Gawie Cloete', age: 38, gender: 'M', programme: 'H&AP', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=12' },
     { id: 3, name: 'Rajesh Pillay', age: 28, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=11' },
@@ -25,10 +34,50 @@ export default function Volunteers() {
     { id: 16, name: 'Pieter Coetzee', age: 29, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=57' },
     { id: 17, name: 'Charnelle Booysen', age: 18, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=24' },
     { id: 18, name: 'Elizabeth Barnard', age: 37, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=29' },
-  ];
+  ]);
 
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'));
+  };
+
+  const handleAddVolunteer = (event) => {
+    event.preventDefault();
+    const programmeFull = newVolunteer.programme === 'CS&D'
+      ? 'Community & Skills Development'
+      : 'Health & Assistance Programme';
+    setVolunteers((previousVolunteers) => [
+      ...previousVolunteers,
+      { ...newVolunteer, id: Date.now(), age: Number(newVolunteer.age), programmeFull },
+    ]);
+    setNewVolunteer({ name: '', age: '', gender: 'F', programme: 'CS&D', img: '' });
+    setImageError('');
+    setIsModalOpen(false);
+  };
+
+  const handleVolunteerImageChange = (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      setNewVolunteer((previousVolunteer) => ({ ...previousVolunteer, img: '' }));
+      setImageError('');
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setImageError('Please select an image file.');
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        setImageError('The selected image could not be loaded.');
+        return;
+      }
+      setNewVolunteer((previousVolunteer) => ({ ...previousVolunteer, img: reader.result }));
+      setImageError('');
+    };
+    reader.onerror = () => setImageError('The selected image could not be loaded.');
+    reader.readAsDataURL(file);
   };
 
   const filteredVolunteers = volunteers.filter((v) =>
@@ -60,7 +109,7 @@ export default function Volunteers() {
             <button className="btn btn-orange" onClick={toggleViewMode}>
               Change view
             </button>
-            <button className="btn btn-orange">+ Add volunteer</button>
+            <button className="btn btn-orange" onClick={() => setIsModalOpen(true)}>+ Add volunteer</button>
           </div>
         </div>
 
@@ -68,7 +117,11 @@ export default function Volunteers() {
         <div className={`volunteers-container ${viewMode}-view`}>
           {filteredVolunteers.map((v) => (
             <div key={v.id} className="volunteer-card">
-              <img src={v.img} alt={v.name} className="avatar" />
+              {v.img
+                ? <img src={v.img} alt={v.name} className="avatar" />
+                : <span className="avatar avatar-placeholder" aria-hidden="true">
+                  {v.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}
+                </span>}
 
               <div className="card-info">
                 <div className="name-wrapper">
@@ -99,6 +152,52 @@ export default function Volunteers() {
           ))}
         </div>
       </main>
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="add-volunteer-title" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3 id="add-volunteer-title">Add Volunteer</h3>
+              <button type="button" className="close-btn" aria-label="Close" onClick={() => setIsModalOpen(false)}>&times;</button>
+            </div>
+            <form className="modal-form" onSubmit={handleAddVolunteer}>
+              <div className="form-group">
+                <label htmlFor="volunteer-name">Full name</label>
+                <input id="volunteer-name" name="name" value={newVolunteer.name} onChange={(event) => setNewVolunteer({ ...newVolunteer, name: event.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="volunteer-image">Photo</label>
+                <input id="volunteer-image" name="image" type="file" accept="image/*" onChange={handleVolunteerImageChange} />
+                {newVolunteer.img && <img src={newVolunteer.img} alt="Volunteer preview" className="image-upload-preview" />}
+                {imageError && <span className="image-upload-error" role="alert">{imageError}</span>}
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="volunteer-age">Age</label>
+                  <input id="volunteer-age" name="age" type="number" min="1" max="120" value={newVolunteer.age} onChange={(event) => setNewVolunteer({ ...newVolunteer, age: event.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="volunteer-gender">Gender</label>
+                  <select id="volunteer-gender" name="gender" value={newVolunteer.gender} onChange={(event) => setNewVolunteer({ ...newVolunteer, gender: event.target.value })}>
+                    <option value="F">Female</option>
+                    <option value="M">Male</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="volunteer-programme">Programme</label>
+                <select id="volunteer-programme" name="programme" value={newVolunteer.programme} onChange={(event) => setNewVolunteer({ ...newVolunteer, programme: event.target.value })}>
+                  <option value="CS&D">Community &amp; Skills Development</option>
+                  <option value="H&AP">Health &amp; Assistance Programme</option>
+                </select>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="submit" className="btn-submit">Add volunteer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

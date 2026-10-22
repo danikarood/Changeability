@@ -3,18 +3,16 @@ import Sidebar from '../components/sidebar';
 import '../App.css';
 
 export default function CalendarPage() {
-  const currentMonth = 'February';
+  const [displayedMonth, setDisplayedMonth] = useState(new Date(2027, 1, 1));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Initial events matching your design
   const [events, setEvents] = useState([
-    { id: 1, title: 'Awareness Workshop', date: '2027-02-07', displayDate: '7/2/27', dayNumber: 7, time: '10:00' },
-    { id: 2, title: 'Beneficiary Assessments', date: '2027-02-11', displayDate: '11/2/27', dayNumber: 11, time: '10:00', highlighted: true },
-    { id: 3, title: 'Community Participationprogramme', date: '2027-02-19', displayDate: '19/2/27', dayNumber: 19, time: '10:00' },
-    { id: 4, title: 'Volunteer orientation', date: '2027-02-28', displayDate: '28/2/27', dayNumber: 28, time: '10:00' },
+    { id: 1, title: 'Awareness Workshop', date: '2027-02-07', time: '10:00' },
+    { id: 2, title: 'Beneficiary Assessments', date: '2027-02-11', time: '10:00' },
+    { id: 3, title: 'Community Participationprogramme', date: '2027-02-19', time: '10:00' },
+    { id: 4, title: 'Volunteer orientation', date: '2027-02-28', time: '10:00' },
   ]);
 
-  // Form State for Modal
   const [newEvent, setNewEvent] = useState({
     title: '',
     date: '',
@@ -27,31 +25,32 @@ export default function CalendarPage() {
 
   const handleAddEventSubmit = (e) => {
     e.preventDefault();
-    if (!newEvent.title || !newEvent.date) return;
-
-    // Format date string (YYYY-MM-DD -> DD/MM/YY & day number)
-    const dateObj = new Date(newEvent.date);
-    const dayNumber = dateObj.getDate() + 1; // Adjust for timezone offset
-    const month = dateObj.getMonth() + 1;
-    const year = dateObj.getFullYear().toString().slice(-2);
-    const displayDate = `${dayNumber}/${month}/${year}`;
-
-    const createdEvent = {
-      id: Date.now(),
-      title: newEvent.title,
-      date: newEvent.date,
-      displayDate: displayDate,
-      dayNumber: dayNumber,
-      time: newEvent.time || '10:00',
-    };
-
-    setEvents([...events, createdEvent]);
+    setEvents((previousEvents) => [
+      ...previousEvents,
+      { id: Date.now(), ...newEvent },
+    ]);
     setNewEvent({ title: '', date: '', time: '10:00' });
     setIsModalOpen(false);
   };
 
-  // 28 days for February grid
-  const daysInMonth = Array.from({ length: 28 }, (_, i) => i + 1);
+  const monthIndex = displayedMonth.getMonth();
+  const year = displayedMonth.getFullYear();
+  const monthLabel = displayedMonth.toLocaleDateString('en', {
+    month: 'long',
+    year: 'numeric',
+  });
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const leadingDays = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
+  const calendarCells = [
+    ...Array(leadingDays).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+  const monthEvents = events
+    .filter((event) => {
+      const [eventYear, eventMonth] = event.date.split('-').map(Number);
+      return eventYear === year && eventMonth === monthIndex + 1;
+    })
+    .sort((a, b) => a.date.localeCompare(b.date));
   const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
   return (
@@ -64,9 +63,21 @@ export default function CalendarPage() {
         {/* Top Header Controls */}
         <div className="calendar-top-bar">
           <div className="month-selector">
-            <button className="arrow-btn" aria-label="Previous month">&#9664;</button>
-            <h1 className="month-title">{currentMonth}</h1>
-            <button className="arrow-btn" aria-label="Next month">&#9654;</button>
+            <button
+              className="arrow-btn"
+              aria-label="Previous month"
+              onClick={() => setDisplayedMonth(new Date(year, monthIndex - 1, 1))}
+            >
+              &#9664;
+            </button>
+            <h1 className="month-title">{monthLabel}</h1>
+            <button
+              className="arrow-btn"
+              aria-label="Next month"
+              onClick={() => setDisplayedMonth(new Date(year, monthIndex + 1, 1))}
+            >
+              &#9654;
+            </button>
           </div>
 
           <button className="add-event-btn" onClick={() => setIsModalOpen(true)}>
@@ -81,11 +92,17 @@ export default function CalendarPage() {
             <h2 className="upcoming-title">Upcoming<br />Events</h2>
 
             <div className="events-card-stack">
-              {events.map((ev) => (
+              {monthEvents.map((ev) => (
                 <div key={ev.id} className="upcoming-event-card">
                   <span className="upcoming-event-name">{ev.title}</span>
                   <div className="upcoming-event-footer">
-                    <span className="upcoming-event-date">{ev.displayDate}</span>
+                    <span className="upcoming-event-date">
+                      {new Date(`${ev.date}T00:00:00`).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'numeric',
+                        year: '2-digit',
+                      })}
+                    </span>
                     <span className="upcoming-event-time">{ev.time}</span>
                   </div>
                 </div>
@@ -103,18 +120,18 @@ export default function CalendarPage() {
             ))}
 
             {/* Day Cells */}
-            {daysInMonth.map((dayNum) => {
-              const dayEvents = events.filter((e) => e.dayNumber === dayNum);
-              const isHighlightDay = dayNum === 11;
+            {calendarCells.map((dayNum, index) => {
+              if (dayNum === null) {
+                return <div key={`empty-${index}`} className="calendar-day-cell empty-day-cell" aria-hidden="true" />;
+              }
+              const dayEvents = monthEvents.filter((event) => Number(event.date.slice(-2)) === dayNum);
 
               return (
                 <div
-                  key={dayNum}
-                  className={`calendar-day-cell ${isHighlightDay ? 'highlighted-day' : ''}`}
+                  key={`${year}-${monthIndex}-${dayNum}`}
+                  className="calendar-day-cell"
                 >
-                  <span className={`day-number ${isHighlightDay ? 'highlight-badge' : ''}`}>
-                    {dayNum}
-                  </span>
+                  <span className="day-number">{dayNum}</span>
 
                   {dayEvents.map((ev) => (
                     <div key={ev.id} className="event-pill">
@@ -131,10 +148,10 @@ export default function CalendarPage() {
       {/* Add Event Modal Popup */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="add-event-title" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Event</h3>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}>&times;</button>
+              <h3 id="add-event-title">Add New Event</h3>
+              <button type="button" className="close-btn" aria-label="Close" onClick={() => setIsModalOpen(false)}>&times;</button>
             </div>
 
             <form onSubmit={handleAddEventSubmit} className="modal-form">
