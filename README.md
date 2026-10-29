@@ -5,6 +5,7 @@ DV200 · Interactive Development 200: From Design to DeploymentA full-stack, res
 **Live Deployments**
 This application is not deployed hence no use to the public but Stitched.
 Platform 1 (Azure /Stitched): https://black-pond-0ff12f910.2.azurestaticapps.net/
+
 📹 Demonstration VideoWatch the complete feature walkthrough and deployment demonstration:https://drive.google.com/file/d/1hiT15VJtDNFMR3oYKac_Q9wYsKCLIa3N/view?usp=sharing
 
 **Design Reference & AttributionSource Design:** UX200 Design AssignmentOriginal UX/UI Designer: UX200 Student Design SpecificationImplementation Scope: Translated pixel-accurate desktop and responsive mobile layouts from the provided UX200 mockups into modular React components, preserving brand typography (Merriweather & Raleway) and color palettes.Visual IdentityPrimary CTA Accent: Warm Orange (#E8642F)Secondary Accent: Red-Orange (#D4613A)Background Canvas: Soft Warm Beige (#EFECE6)Card & Module Surfaces: Ivory Cream (#F5F1EA)
