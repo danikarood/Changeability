@@ -1,54 +1,50 @@
-# DV200 S1 - Scrum Analytics Project
-**Student Name:** Danika Rood  
-**Project:** URC Team Comparison & Data Visualisation
+**Changeability**
 
----
+DV200 · Interactive Development 200: From Design to DeploymentA full-stack, responsive web application for managing operations at ChangeAbility NGO—connecting people, care, and possibility
 
-## 🎥 Project Walkthrough Video
-Because the video file was too large to submit directly to the platform, I have uploaded my screen recording to Google Drive. 
-[https://drive.google.com/drive/folders/1kTmfApFjkKWwnxJd4zFYd0XLYrhXEBhG?usp=sharing]
+🚀 Live Deployments
+This application is not deployed hence no use to the public but Stitched.
+Platform 1 (Azure /Stitched): https://black-pond-0ff12f910.2.azurestaticapps.net/
+📹 Demonstration VideoWatch the complete feature walkthrough and deployment demonstration:
 
-*(Note to lecturer: Please ensure you use this link directly. I have set the access permissions to "Anyone with the link" so you shouldn't need to request access!)*
+🎨 Design Reference & AttributionSource Design: UX200 Design AssignmentOriginal UX/UI Designer: UX200 Student Design SpecificationImplementation Scope: Translated pixel-accurate desktop and responsive mobile layouts from the provided UX200 mockups into modular React components, preserving brand typography (Merriweather & Raleway) and color palettes.Visual IdentityPrimary CTA Accent: Warm Orange (#E8642F)Secondary Accent: Red-Orange (#D4613A)Background Canvas: Soft Warm Beige (#EFECE6)Card & Module Surfaces: Ivory Cream (#F5F1EA)
 
----
+✨ Key Features & User ExperienceAuthentication Gateway (/login, /signup)Responsive dual-column view with decorative branding patterns.Interactive password show/hide toggles and credentials state validation.Sticky Navigation System (Sidebar)Fixed positioning with full-height canvas scrolling.Active tab styling with white pill indicators using react-router-dom.Analytics Dashboard (/dashboard)Visual charts for Disability classifications, Dietary requirements, and Age & Gender demographics.Embedded organic geometric background patterns within card negative spaces.Beneficiaries Directory (/beneficiaries)Dynamic Grid View (Cards) vs. List View (Rows) toggling via React state.Real-time search filter and program tags (H&AP, CS&D).Volunteers Directory (/volunteers)Grid and List layout modes with complete contact and program metadata.Interactive Calendar (/calendar)Full month calendar grid paired with an Upcoming Events feed.Interactive "Add Event" Modal Popup: pushes new events dynamically to both the month grid and upcoming feed.Dynamic Profile View (/profile)Unified profile view rendering detailed records for both beneficiaries and volunteers using location route state.
 
-## 📝 About the Project
-For this project, I built a React application that connects to a live Rugby API to fetch and compare statistics for the 2024 United Rugby Championship (URC) season. 
+🛠️ Tech Stack & ArchitectureFrontend: React 18 (Vite build tool), React Router DOM v6, Custom Modular CSS variables.Backend API: Node.js, Express.js.Database: MongoDB Atlas (Mongoose ODM).Utilities & Environment: Axios, CORS, Dotenv, Nodemon.
 
-### Key Features:
-* **Interactive Landing Page:** A custom homepage with an auto-scrolling carousel showcasing the teams.
-* **Live API Data:** Fetches active 2024 season match data directly from `api-sports.io`.
-* **Head-to-Head Comparison:** Users can select any two teams from a dropdown to compare their performance side-by-side.
-* **Charts & Visuals:** I used Chart.js to render Points Bar Charts, Season Win/Loss Pie Charts, and a custom Skills Radar Chart.
-* **Local Assets Fallback:** Because the API images were sometimes failing to load or giving broken links, I manually downloaded high-quality logos for the main teams and hosted them locally in the project assets folder to make sure the app looks premium.
-
----
-
-## 🛠️ How to Run the App Locally
-
-If you want to pull the project and run it on your local machine, just follow these steps:
-
-1. Clone the GitHub repository:
-   `git clone [PLAK_JOU_GITHUB_REPO_LINK_HIER]`
-2. Open your terminal and navigate into the folder:
-   `cd scrum_analytics`
-3. Install the required Node modules:
-   `npm install`
-4. Run the project locally:
-   `npm start`
-
----
-*Thank you for taking the time to assess my project!*
-
-## ChangeAbility MongoDB API
-
-The ChangeAbility frontend is a Create React App project in `frontend/`. Its API is an Express and MongoDB service in `backend/`.
-
-1. Install the API dependencies with `npm install --prefix backend`.
-2. Copy `backend/.env.example` to `backend/.env` and set `MONGO_URI` and a private `JWT_SECRET` of at least 32 characters. Generate a secret with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. For a local MongoDB instance, the example URI is ready to use. For MongoDB Atlas, replace it with your Atlas connection string.
-   If Node.js cannot resolve Atlas SRV records on your network, optionally set `DNS_SERVERS` to a comma-separated DNS resolver IP available on that machine.
-3. Optionally copy `frontend/.env.example` to `frontend/.env` to override the API URL.
-4. Start the API in one terminal with `npm run server` from the repository root.
-5. Start the frontend in another terminal with `npm start`.
-
-Sign-up and sign-in return a JWT; the frontend sends it with requests to protected API routes. Passwords are stored as bcrypt hashes. Beneficiary, volunteer, and event records are stored in MongoDB. Data screens require signing in and show an API error if the service or database is unavailable.
+📂 Repository StructureChangeability/
+├── backend/
+│   ├── models/
+│   │   ├── User.js          # Authentication Schema
+│   │   ├── Entity.js        # Beneficiaries & Volunteers Schema
+│   │   └── Event.js         # Calendar Events Schema
+│   ├── .env                 # Secret environment variables (Git-ignored)
+│   ├── package.json
+│   └── server.js            # Node/Express API & Database Connection
+│
+├── src/
+│   ├── assets/              # Logo & graphic assets
+│   ├── components/
+│   │   └── Sidebar.jsx      # Sticky Navigation Bar
+│   ├── pages/
+│   │   ├── Login.jsx        # Login View
+│   │   ├── SignUp.jsx       # Registration View
+│   │   ├── Dashboard.jsx    # Analytics & Metrics View
+│   │   ├── Beneficiaries.jsx# Beneficiaries List/Grid View
+│   │   ├── Volunteers.jsx   # Volunteers Directory
+│   │   ├── Calendar.jsx     # Event Grid & Modal Popup
+│   │   └── ProfileView.jsx  # Detailed Individual Profile View
+│   ├── utils/
+│   │   └── api.js           # Axios Configuration Instance
+│   ├── App.jsx              # Routes Registry
+│   └── main.jsx             # Application Root
+│
+└── README.md                # Submission Documentation
+🌐 API Endpoint ReferenceMethodEndpointDescriptionPOST/api/auth/signupRegister new administrative userPOST/api/auth/loginAuthenticate user credentialsGET/api/entities/beneficiaryRetrieve list of beneficiariesGET/api/entities/volunteerRetrieve list of volunteersPOST/api/entitiesCreate new beneficiary/volunteer recordGET/api/eventsFetch calendar eventsPOST/api/eventsCreate new calendar event🚀 Local Setup InstructionsPrerequisitesNode.js (v18+)MongoDB Atlas cluster or local MongoDB setup1. Backend Server Setupcd backend
+npm install
+Create a .env file in the backend/ folder:PORT=5000
+MONGO_URI=your_mongodb_atlas_connection_string
+Start the API server:npm run dev
+2. Frontend SetupOpen a second terminal window at the project root:npm install
+npm run dev
