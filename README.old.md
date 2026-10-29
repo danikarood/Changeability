@@ -1,2 +1,0 @@
-# scrum_analytics
-
