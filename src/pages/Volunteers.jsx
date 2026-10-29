@@ -11,9 +11,7 @@ export default function Volunteers() {
     age: '',
     gender: 'F',
     programme: 'CS&D',
-    img: '',
   });
-  const [imageError, setImageError] = useState('');
 
   const [volunteers, setVolunteers] = useState([
     { id: 1, name: 'Marlene Fourie', age: 41, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=47' },
@@ -47,37 +45,10 @@ export default function Volunteers() {
       : 'Health & Assistance Programme';
     setVolunteers((previousVolunteers) => [
       ...previousVolunteers,
-      { ...newVolunteer, id: Date.now(), age: Number(newVolunteer.age), programmeFull },
+      { ...newVolunteer, id: Date.now(), age: Number(newVolunteer.age), programmeFull, img: '' },
     ]);
-    setNewVolunteer({ name: '', age: '', gender: 'F', programme: 'CS&D', img: '' });
-    setImageError('');
+    setNewVolunteer({ name: '', age: '', gender: 'F', programme: 'CS&D' });
     setIsModalOpen(false);
-  };
-
-  const handleVolunteerImageChange = (event) => {
-    const file = event.target.files && event.target.files[0];
-    if (!file) {
-      setNewVolunteer((previousVolunteer) => ({ ...previousVolunteer, img: '' }));
-      setImageError('');
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      setImageError('Please select an image file.');
-      event.target.value = '';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') {
-        setImageError('The selected image could not be loaded.');
-        return;
-      }
-      setNewVolunteer((previousVolunteer) => ({ ...previousVolunteer, img: reader.result }));
-      setImageError('');
-    };
-    reader.onerror = () => setImageError('The selected image could not be loaded.');
-    reader.readAsDataURL(file);
   };
 
   const filteredVolunteers = volunteers.filter((v) =>
@@ -105,7 +76,6 @@ export default function Volunteers() {
           </div>
 
           <div className="action-buttons">
-            <button className="btn btn-secondary">Select</button>
             <button className="btn btn-orange" onClick={toggleViewMode}>
               Change view
             </button>
@@ -163,12 +133,6 @@ export default function Volunteers() {
               <div className="form-group">
                 <label htmlFor="volunteer-name">Full name</label>
                 <input id="volunteer-name" name="name" value={newVolunteer.name} onChange={(event) => setNewVolunteer({ ...newVolunteer, name: event.target.value })} required />
-              </div>
-              <div className="form-group">
-                <label htmlFor="volunteer-image">Photo</label>
-                <input id="volunteer-image" name="image" type="file" accept="image/*" onChange={handleVolunteerImageChange} />
-                {newVolunteer.img && <img src={newVolunteer.img} alt="Volunteer preview" className="image-upload-preview" />}
-                {imageError && <span className="image-upload-error" role="alert">{imageError}</span>}
               </div>
               <div className="form-row">
                 <div className="form-group">
