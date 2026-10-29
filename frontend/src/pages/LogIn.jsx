@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/ChangeAbility-Logo.webp';
 import API, { getApiError } from '../utils/api';
@@ -7,6 +7,7 @@ import '../LogIn.css';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const passwordInputRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
@@ -14,19 +15,49 @@ export default function Login() {
 
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((currentFormData) => ({
+      ...currentFormData,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordToggle = () => {
+    const input = passwordInputRef.current;
+    const start = input && document.activeElement === input
+      ? input.selectionStart ?? input.value.length
+      : input?.value.length ?? 0;
+    const end = input && document.activeElement === input
+      ? input.selectionEnd ?? start
+      : start;
+
+    setShowPassword((isVisible) => !isVisible);
+
+    requestAnimationFrame(() => {
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(start, end);
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const password = new FormData(e.currentTarget).get('password');
+    if (typeof password !== 'string') {
+      setError('Please enter your password.');
+      return;
+    }
+
     setError('');
     setIsSubmitting(true);
     try {
-      const { data } = await API.post('/auth/login', formData);
+      const { data } = await API.post('/auth/login', {
+        ...formData,
+        password,
+      });
       localStorage.removeItem('changeabilityToken');
       sessionStorage.removeItem('changeabilityToken');
       const storage = rememberMe ? localStorage : sessionStorage;
@@ -97,18 +128,26 @@ export default function Login() {
               <label htmlFor="password">Password</label>
               <div className="password-input-wrapper">
                 <input
+                  ref={passwordInputRef}
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   placeholder="example@123"
-                  value={formData.password}
-                  onChange={handleChange}
+                  autoComplete="current-password"
                   required
                 />
                 <button
                   type="button"
                   className="eye-icon-btn"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={handlePasswordToggle}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    const input = passwordInputRef.current;
+                    if (input && document.activeElement !== input) {
+                      input.focus();
+                      input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                  }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   aria-pressed={showPassword}
                 >

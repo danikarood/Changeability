@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/static/css/main.7f5539d8.css",
-    "main.js": "/static/js/main.1b509eba.js",
+    "main.css": "/static/css/main.3f39e5d6.css",
+    "main.js": "/static/js/main.97b9e174.js",
     "static/media/ChangeAbility-Logo.webp": "/static/media/ChangeAbility-Logo.4daad6a6140227d7a149.webp",
     "index.html": "/index.html",
-    "main.7f5539d8.css.map": "/static/css/main.7f5539d8.css.map",
-    "main.1b509eba.js.map": "/static/js/main.1b509eba.js.map"
+    "main.3f39e5d6.css.map": "/static/css/main.3f39e5d6.css.map",
+    "main.97b9e174.js.map": "/static/js/main.97b9e174.js.map"
   },
   "entrypoints": [
-    "static/css/main.7f5539d8.css",
-    "static/js/main.1b509eba.js"
+    "static/css/main.3f39e5d6.css",
+    "static/js/main.97b9e174.js"
   ]
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/ChangeAbility-Logo.webp';
 import API, { getApiError } from '../utils/api';
@@ -6,6 +6,8 @@ import '../SignUp.css';
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const passwordInputRef = useRef(null);
+  const confirmPasswordInputRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
@@ -14,17 +16,63 @@ export default function SignUp() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    password: '',
-    confirmPassword: '',
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((currentFormData) => ({
+      ...currentFormData,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordToggle = () => {
+    const input = passwordInputRef.current;
+    const start = input && document.activeElement === input
+      ? input.selectionStart ?? input.value.length
+      : input?.value.length ?? 0;
+    const end = input && document.activeElement === input
+      ? input.selectionEnd ?? start
+      : start;
+
+    setShowPassword((isVisible) => !isVisible);
+
+    requestAnimationFrame(() => {
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(start, end);
+    });
+  };
+
+  const handleConfirmPasswordToggle = () => {
+    const input = confirmPasswordInputRef.current;
+    const start = input && document.activeElement === input
+      ? input.selectionStart ?? input.value.length
+      : input?.value.length ?? 0;
+    const end = input && document.activeElement === input
+      ? input.selectionEnd ?? start
+      : start;
+
+    setShowConfirmPassword((isVisible) => !isVisible);
+
+    requestAnimationFrame(() => {
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(start, end);
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+    const submittedForm = new FormData(e.currentTarget);
+    const password = submittedForm.get('password');
+    const confirmPassword = submittedForm.get('confirmPassword');
+    if (typeof password !== 'string' || typeof confirmPassword !== 'string') {
+      setError('Please enter and confirm your password.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
@@ -35,7 +83,7 @@ export default function SignUp() {
       await API.post('/auth/signup', {
         fullName: formData.fullName,
         email: formData.email,
-        password: formData.password,
+        password,
       });
       navigate('/login', { state: { message: 'Account created. You can now sign in.' } });
     } catch (requestError) {
@@ -113,20 +161,28 @@ export default function SignUp() {
               <label htmlFor="password">PASSWORD</label>
               <div className="password-input-wrapper">
                 <input
+                  ref={passwordInputRef}
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   placeholder="example@123"
                   minLength={8}
                   maxLength={72}
-                  value={formData.password}
-                  onChange={handleChange}
+                  autoComplete="new-password"
                   required
                 />
                 <button
                   type="button"
                   className="eye-icon-btn"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={handlePasswordToggle}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    const input = passwordInputRef.current;
+                    if (input && document.activeElement !== input) {
+                      input.focus();
+                      input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                  }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   aria-pressed={showPassword}
                 >
@@ -143,20 +199,28 @@ export default function SignUp() {
               <label htmlFor="confirmPassword">CONFIRM PASSWORD</label>
               <div className="password-input-wrapper">
                 <input
+                  ref={confirmPasswordInputRef}
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="example@123"
                   minLength={8}
                   maxLength={72}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
+                  autoComplete="new-password"
                   required
                 />
                 <button
                   type="button"
                   className="eye-icon-btn"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={handleConfirmPasswordToggle}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    const input = confirmPasswordInputRef.current;
+                    if (input && document.activeElement !== input) {
+                      input.focus();
+                      input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                  }}
                   aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   aria-pressed={showConfirmPassword}
                 >
