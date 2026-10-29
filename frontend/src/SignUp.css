@@ -181,6 +181,13 @@ html, body {
   line-height: 1.4;
 }
 
+.api-error {
+  margin: 0 0 16px;
+  color: #A12B1F;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* Inputs & Buttons */
 .signup-form {
   display: flex;

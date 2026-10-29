@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Beneficiaries from './pages/Beneficiaries';
 import Volunteers from './pages/Volunteers';
 import CalendarPage from './pages/Calendar';
+import ProfileView from './pages/ProfileView';
 export default function App() {
   return (
     <Router>
@@ -30,6 +31,8 @@ export default function App() {
         <Route path="/Volunteers" element={<Volunteers />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/Calendar" element={<CalendarPage />} />
+        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/Profile" element={<ProfileView />} />
       </Routes>
     </Router>
   );

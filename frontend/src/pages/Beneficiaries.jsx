@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import API, { getApiError } from '../utils/api';
 import '../App.css';
 
 export default function Beneficiaries() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,43 +15,65 @@ export default function Beneficiaries() {
     gender: 'Female',
     programme: 'CS&D',
     img: '',
+    email: '',
+    phone: '',
+    address: '',
   });
   const [imageError, setImageError] = useState('');
+  const [apiError, setApiError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState([]);
 
-  const [beneficiaries, setBeneficiaries] = useState([
-    { id: 1, name: 'Ayanda Nkosi', age: 29, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=49' },
-    { id: 2, name: 'Byron Julies', age: 19, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=11' },
-    { id: 3, name: 'Chad Johnstone', age: 28, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=13' },
-    { id: 4, name: 'Charlene Fortuin', age: 46, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=47' },
-    { id: 5, name: 'Daniel Meyer', age: 26, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=15' },
-    { id: 6, name: 'Dipak Patel', age: 23, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=12' },
-    { id: 7, name: 'Grace Chen', age: 48, gender: 'Female', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=45' },
-    { id: 8, name: 'Janse Ndlovu', age: 41, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=68' },
-    { id: 9, name: 'Johan Steyn', age: 52, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=33' },
-    { id: 10, name: 'Johan van Heerden', age: 64, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=59' },
-    { id: 11, name: 'Lerato Mofele', age: 31, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=32' },
-    { id: 12, name: 'Mandla Zwane', age: 35, gender: 'Male', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=53' },
-    { id: 13, name: 'Nadie Petersen', age: 30, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=20' },
-    { id: 14, name: 'Nokuthula Dlamini', age: 39, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=26' },
-    { id: 15, name: 'Priya Naidoo', age: 34, gender: 'Female', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=24' },
-    { id: 16, name: 'Robin de Bruyn', age: 21, gender: 'Female', programme: 'CS&D', img: 'https://i.pravatar.cc/150?img=28' },
-    { id: 17, name: 'Thandeka Mthembu', age: 27, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=29' },
-    { id: 18, name: 'Zanele Khumalo', age: 36, gender: 'Female', programme: 'H&AP', img: 'https://i.pravatar.cc/150?img=44' },
-  ]);
+  useEffect(() => {
+    let active = true;
+    API.get('/entities/beneficiary')
+      .then(({ data }) => {
+        if (active) setBeneficiaries(data);
+      })
+      .catch((error) => {
+        if (active) setApiError(getApiError(error));
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'));
   };
 
-  const handleAddBeneficiary = (event) => {
+  const handleAddBeneficiary = async (event) => {
     event.preventDefault();
-    setBeneficiaries((previousBeneficiaries) => [
-      ...previousBeneficiaries,
-      { ...newBeneficiary, id: Date.now(), age: Number(newBeneficiary.age) },
-    ]);
-    setNewBeneficiary({ name: '', age: '', gender: 'Female', programme: 'CS&D', img: '' });
-    setImageError('');
-    setIsModalOpen(false);
+    setIsSaving(true);
+    setApiError('');
+    try {
+      const { data } = await API.post('/entities', {
+        ...newBeneficiary,
+        age: Number(newBeneficiary.age),
+        type: 'beneficiary',
+      });
+      setBeneficiaries((previousBeneficiaries) => [...previousBeneficiaries, data]);
+      setNewBeneficiary({
+        name: '',
+        age: '',
+        gender: 'Female',
+        programme: 'CS&D',
+        img: '',
+        email: '',
+        phone: '',
+        address: '',
+      });
+      setImageError('');
+      setIsModalOpen(false);
+    } catch (error) {
+      setApiError(getApiError(error));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleBeneficiaryImageChange = (event) => {
@@ -109,7 +134,9 @@ export default function Beneficiaries() {
           </div>
         </div>
 
-       
+        {apiError && <p className="image-upload-error" role="alert">{apiError}</p>}
+        {isLoading && <p role="status">Loading beneficiaries...</p>}
+
         {/* Dynamic Display Area (Grid vs List) */}
         <div className={`beneficiaries-container ${viewMode}-view`}>
           {filteredBeneficiaries.map((b) => (
@@ -140,7 +167,12 @@ export default function Beneficiaries() {
                 </div>
               </div>
 
-              <button className="view-profile-btn">View Profile</button>
+              <button
+                className="view-profile-btn"
+                onClick={() => navigate('/profile', { state: { profile: b } })}
+              >
+                View Profile
+              </button>
             </div>
           ))}
         </div>
@@ -162,6 +194,7 @@ export default function Beneficiaries() {
                 <input id="beneficiary-image" name="image" type="file" accept="image/*" onChange={handleBeneficiaryImageChange} />
                 {newBeneficiary.img && <img src={newBeneficiary.img} alt="Beneficiary preview" className="image-upload-preview" />}
                 {imageError && <span className="image-upload-error" role="alert">{imageError}</span>}
+                {apiError && <span className="image-upload-error" role="alert">{apiError}</span>}
               </div>
               <div className="form-row">
                 <div className="form-group">
@@ -183,9 +216,23 @@ export default function Beneficiaries() {
                   <option value="H&AP">Health &amp; Assistance Programme</option>
                 </select>
               </div>
+              <div className="form-group">
+                <label htmlFor="beneficiary-email">Email address</label>
+                <input id="beneficiary-email" name="email" type="email" value={newBeneficiary.email} onChange={(event) => setNewBeneficiary({ ...newBeneficiary, email: event.target.value })} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="beneficiary-phone">Phone number</label>
+                  <input id="beneficiary-phone" name="phone" type="tel" value={newBeneficiary.phone} onChange={(event) => setNewBeneficiary({ ...newBeneficiary, phone: event.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="beneficiary-address">Address</label>
+                  <input id="beneficiary-address" name="address" value={newBeneficiary.address} onChange={(event) => setNewBeneficiary({ ...newBeneficiary, address: event.target.value })} />
+                </div>
+              </div>
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn-submit">Add beneficiary</button>
+                <button type="submit" className="btn-submit" disabled={isSaving}>{isSaving ? 'Saving...' : 'Add beneficiary'}</button>
               </div>
             </form>
           </div>

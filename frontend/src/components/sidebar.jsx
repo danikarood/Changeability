@@ -7,7 +7,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Perform any logout cleanup here if needed
+    localStorage.removeItem('changeabilityToken');
+    sessionStorage.removeItem('changeabilityToken');
     navigate('/login');
   };
 

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/ChangeAbility-Logo.webp';
+import API, { getApiError } from '../utils/api';
 import '../SignUp.css';
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -18,9 +22,27 @@ export default function SignUp() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Submitted:', formData);
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await API.post('/auth/signup', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate('/login', { state: { message: 'Account created. You can now sign in.' } });
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -58,6 +80,7 @@ export default function SignUp() {
           <p className="form-description">
             Join ChangeAbility to help coordinate meaningful care and support.
           </p>
+          {error && <p className="api-error" role="alert">{error}</p>}
 
           <form onSubmit={handleSubmit} className="signup-form">
             <div className="input-group">
@@ -94,6 +117,8 @@ export default function SignUp() {
                   id="password"
                   name="password"
                   placeholder="example@123"
+                  minLength={8}
+                  maxLength={72}
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -122,6 +147,8 @@ export default function SignUp() {
                   id="confirmPassword"
                   name="confirmPassword"
                   placeholder="example@123"
+                  minLength={8}
+                  maxLength={72}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -142,8 +169,8 @@ export default function SignUp() {
               </div>
             </div>
 
-            <button type="submit" className="submit-btn">
-              CREATE ACCOUNT
+            <button type="submit" className="submit-btn" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating account...' : 'CREATE ACCOUNT'}
             </button>
           </form>
 

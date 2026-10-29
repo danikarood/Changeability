@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/sidebar';
+import API, { getApiError } from '../utils/api';
 import '../App.css';
 
 export default function CalendarPage() {
   const [displayedMonth, setDisplayedMonth] = useState(new Date(2027, 1, 1));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [events, setEvents] = useState([
-    { id: 1, title: 'Awareness Workshop', date: '2027-02-07', time: '10:00' },
-    { id: 2, title: 'Beneficiary Assessments', date: '2027-02-11', time: '10:00' },
-    { id: 3, title: 'Community Participationprogramme', date: '2027-02-19', time: '10:00' },
-    { id: 4, title: 'Volunteer orientation', date: '2027-02-28', time: '10:00' },
-  ]);
+  const [events, setEvents] = useState([]);
+  const [apiError, setApiError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -19,18 +18,41 @@ export default function CalendarPage() {
     time: '10:00',
   });
 
+  useEffect(() => {
+    let active = true;
+    API.get('/events')
+      .then(({ data }) => {
+        if (active) setEvents(data);
+      })
+      .catch((error) => {
+        if (active) setApiError(getApiError(error));
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleInputChange = (e) => {
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
 
-  const handleAddEventSubmit = (e) => {
+  const handleAddEventSubmit = async (e) => {
     e.preventDefault();
-    setEvents((previousEvents) => [
-      ...previousEvents,
-      { id: Date.now(), ...newEvent },
-    ]);
-    setNewEvent({ title: '', date: '', time: '10:00' });
-    setIsModalOpen(false);
+    setIsSaving(true);
+    setApiError('');
+    try {
+      const { data } = await API.post('/events', newEvent);
+      setEvents((previousEvents) => [...previousEvents, data]);
+      setNewEvent({ title: '', date: '', time: '10:00' });
+      setIsModalOpen(false);
+    } catch (error) {
+      setApiError(getApiError(error));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const monthIndex = displayedMonth.getMonth();
@@ -60,6 +82,9 @@ export default function CalendarPage() {
 
       {/* Main Content Area */}
       <main className="calendar-main-content">
+        {apiError && <p className="image-upload-error" role="alert">{apiError}</p>}
+        {isLoading && <p role="status">Loading events...</p>}
+
         {/* Top Header Controls */}
         <div className="calendar-top-bar">
           <div className="month-selector">
@@ -155,6 +180,7 @@ export default function CalendarPage() {
             </div>
 
             <form onSubmit={handleAddEventSubmit} className="modal-form">
+              {apiError && <p className="image-upload-error" role="alert">{apiError}</p>}
               <div className="form-group">
                 <label htmlFor="title">Event Title</label>
                 <input
@@ -202,8 +228,8 @@ export default function CalendarPage() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-submit">
-                  Add Event
+                <button type="submit" className="btn-submit" disabled={isSaving}>
+                  {isSaving ? 'Saving...' : 'Add Event'}
                 </button>
               </div>
             </form>

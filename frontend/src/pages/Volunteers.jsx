@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
+import API, { getApiError } from '../utils/api';
 import '../App.css';
 
 export default function Volunteers() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,44 +14,68 @@ export default function Volunteers() {
     age: '',
     gender: 'F',
     programme: 'CS&D',
+    email: '',
+    phone: '',
+    address: '',
+    img: '',
   });
+  const [volunteers, setVolunteers] = useState([]);
+  const [apiError, setApiError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const [volunteers, setVolunteers] = useState([
-    { id: 1, name: 'Marlene Fourie', age: 41, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=47' },
-    { id: 2, name: 'Gawie Cloete', age: 38, gender: 'M', programme: 'H&AP', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=12' },
-    { id: 3, name: 'Rajesh Pillay', age: 28, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=11' },
-    { id: 4, name: 'Anele Pillay', age: 32, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=32' },
-    { id: 5, name: 'Vikash Govender', age: 31, gender: 'M', programme: 'H&AP', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=68' },
-    { id: 6, name: 'Byron Julies', age: 19, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=13' },
-    { id: 7, name: 'Dipak Patel', age: 23, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=15' },
-    { id: 8, name: 'Mandla Zwane', age: 35, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=53' },
-    { id: 9, name: 'Robin de Bruyn', age: 21, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=28' },
-    { id: 10, name: 'Chad Johnstone', age: 28, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=33' },
-    { id: 11, name: 'Nadia Petersen', age: 30, gender: 'F', programme: 'H&AP', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=20' },
-    { id: 12, name: 'Bongani Ntuli', age: 28, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=59' },
-    { id: 13, name: 'Warren Adams', age: 41, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=60' },
-    { id: 14, name: 'Palesa Maloi', age: 27, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=49' },
-    { id: 15, name: 'Wesley Daniels', age: 17, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=65' },
-    { id: 16, name: 'Pieter Coetzee', age: 29, gender: 'M', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=57' },
-    { id: 17, name: 'Charnelle Booysen', age: 18, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=24' },
-    { id: 18, name: 'Elizabeth Barnard', age: 37, gender: 'F', programme: 'CS&D', programmeFull: 'Community & Skills Development', img: 'https://i.pravatar.cc/150?img=29' },
-  ]);
+  useEffect(() => {
+    let active = true;
+    API.get('/entities/volunteer')
+      .then(({ data }) => {
+        if (active) setVolunteers(data);
+      })
+      .catch((error) => {
+        if (active) setApiError(getApiError(error));
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'));
   };
 
-  const handleAddVolunteer = (event) => {
+  const handleAddVolunteer = async (event) => {
     event.preventDefault();
     const programmeFull = newVolunteer.programme === 'CS&D'
       ? 'Community & Skills Development'
       : 'Health & Assistance Programme';
-    setVolunteers((previousVolunteers) => [
-      ...previousVolunteers,
-      { ...newVolunteer, id: Date.now(), age: Number(newVolunteer.age), programmeFull, img: '' },
-    ]);
-    setNewVolunteer({ name: '', age: '', gender: 'F', programme: 'CS&D' });
-    setIsModalOpen(false);
+    setIsSaving(true);
+    setApiError('');
+    try {
+      const { data } = await API.post('/entities', {
+        ...newVolunteer,
+        age: Number(newVolunteer.age),
+        programmeFull,
+        type: 'volunteer',
+      });
+      setVolunteers((previousVolunteers) => [...previousVolunteers, data]);
+      setNewVolunteer({
+        name: '',
+        age: '',
+        gender: 'F',
+        programme: 'CS&D',
+        email: '',
+        phone: '',
+        address: '',
+        img: '',
+      });
+      setIsModalOpen(false);
+    } catch (error) {
+      setApiError(getApiError(error));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const filteredVolunteers = volunteers.filter((v) =>
@@ -82,6 +109,9 @@ export default function Volunteers() {
             <button className="btn btn-orange" onClick={() => setIsModalOpen(true)}>+ Add volunteer</button>
           </div>
         </div>
+
+        {apiError && <p className="image-upload-error" role="alert">{apiError}</p>}
+        {isLoading && <p role="status">Loading volunteers...</p>}
 
         {/* Dynamic Volunteer Cards Container */}
         <div className={`volunteers-container ${viewMode}-view`}>
@@ -117,7 +147,12 @@ export default function Volunteers() {
                 </div>
               </div>
 
-              <button className="view-profile-btn">View Profile</button>
+              <button
+                className="view-profile-btn"
+                onClick={() => navigate('/profile', { state: { profile: v } })}
+              >
+                View Profile
+              </button>
             </div>
           ))}
         </div>
@@ -154,9 +189,27 @@ export default function Volunteers() {
                   <option value="H&AP">Health &amp; Assistance Programme</option>
                 </select>
               </div>
+              <div className="form-group">
+                <label htmlFor="volunteer-image">Photo URL</label>
+                <input id="volunteer-image" name="img" type="url" value={newVolunteer.img} onChange={(event) => setNewVolunteer({ ...newVolunteer, img: event.target.value })} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="volunteer-email">Email address</label>
+                <input id="volunteer-email" name="email" type="email" value={newVolunteer.email} onChange={(event) => setNewVolunteer({ ...newVolunteer, email: event.target.value })} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="volunteer-phone">Phone number</label>
+                  <input id="volunteer-phone" name="phone" type="tel" value={newVolunteer.phone} onChange={(event) => setNewVolunteer({ ...newVolunteer, phone: event.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="volunteer-address">Address</label>
+                  <input id="volunteer-address" name="address" value={newVolunteer.address} onChange={(event) => setNewVolunteer({ ...newVolunteer, address: event.target.value })} />
+                </div>
+              </div>
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn-submit">Add volunteer</button>
+                <button type="submit" className="btn-submit" disabled={isSaving}>{isSaving ? 'Saving...' : 'Add volunteer'}</button>
               </div>
             </form>
           </div>

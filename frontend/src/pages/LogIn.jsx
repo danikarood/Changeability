@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/ChangeAbility-Logo.webp';
+import API, { getApiError } from '../utils/api';
 import '../LogIn.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -17,11 +21,22 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login Submitted:', { ...formData, rememberMe });
-    // Navigate to dashboard after login
-    navigate('/dashboard');
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const { data } = await API.post('/auth/login', formData);
+      localStorage.removeItem('changeabilityToken');
+      sessionStorage.removeItem('changeabilityToken');
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('changeabilityToken', data.token);
+      navigate('/dashboard');
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,6 +74,8 @@ export default function Login() {
           <p className="form-description">
             Please enter your credentials to access your account.
           </p>
+          {location.state?.message && <p className="api-error" role="status">{location.state.message}</p>}
+          {error && <p className="api-error" role="alert">{error}</p>}
 
           <form onSubmit={handleSubmit} className="login-form">
             {/* Email Address */}
@@ -121,8 +138,8 @@ export default function Login() {
             </div>
 
             {/* Submit Button */}
-            <button type="submit" className="submit-btn">
-              Sign In
+            <button type="submit" className="submit-btn" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
